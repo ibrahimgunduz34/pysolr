@@ -725,6 +725,11 @@ class Solr(object):
 
                 attrs = {'name': key}
 
+                if isinstance(bit, dict):
+                    if 'set' in bit:
+                        bit = bit['set']
+                        attrs['update'] = 'set'
+
                 if boost and key in boost:
                     attrs['boost'] = force_unicode(boost[key])
 
