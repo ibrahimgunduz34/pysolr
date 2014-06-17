@@ -212,6 +212,14 @@ class SolrError(Exception):
     pass
 
 
+class TimeoutError(Exception):
+    pass
+
+
+class ConnectionError(Exception):
+    pass
+
+
 class Results(object):
     def __init__(self, docs, hits, highlighting=None, facets=None,
                  spellcheck=None, stats=None, qtime=None, debug=None,
@@ -306,12 +314,13 @@ class Solr(object):
         except requests.exceptions.Timeout as err:
             error_message = "Connection to server '%s' timed out: %s"
             self.log.error(error_message, url, err, exc_info=True)
-            raise SolrError(error_message % (url, err))
+            raise TimeoutError(error_message % (url, err))
+
         except requests.exceptions.ConnectionError as err:
             error_message = "Failed to connect to server at '%s', are you sure that URL is correct? Checking it in a browser might help: %s"
             params = (url, err)
             self.log.error(error_message, *params, exc_info=True)
-            raise SolrError(error_message % params)
+            raise ConnectionError(error_message % params)
 
         end_time = time.time()
         self.log.info("Finished '%s' (%s) with body '%s' in %0.3f seconds.",
